@@ -4,34 +4,42 @@
 extern crate serde_json;
 extern crate serde;
 
+
 use rocket::response::content;
 use rocket::response::status;
 use rocket::State;
 use std::sync::Mutex;
+use serde::{Deserialize, Serialize};
+#[derive(Serialize, Deserialize)]
+struct Person{
+	name: String,
+	age: u8,
+	height: f32
+}
 
-pub type NameList = Vec<String>;
-pub type SafeNameList = Mutex<NameList>;
+pub type PersonList = Vec<Person>;
+pub type SafePersonList = Mutex<PersonList>;
 
 #[get("/")]
 fn index() -> content::Html<String>  {
 	
 	use std::fs;
 	let html = fs::read_to_string("src/index.html")
-						.expect("Unable to read file");
+		.expect("Unable to read file");
     return content::Html(html);
 }
 
-#[get("/<name>")]
-fn AddToList(name: String, state: State<SafeNameList>) -> String {
+#[get("/<name>/<age>/<height>")]
+fn AddToList(name: String, age: u8, height: f32, state: State<SafePersonList>) -> String {
 	let list = &mut state.inner().lock().unwrap();
-	list.push(name);
+	list.push(Person { name: name, age: age, height: height });
 
 	let listRef =&**list; 
 	return serde_json::to_string(listRef).unwrap();
 }
 
 #[get("/list")]
-fn ReadFromList(state: State<SafeNameList>) -> String {
+fn ReadFromList(state: State<SafePersonList>) -> String {
 	let list = state.inner().lock().unwrap();
 	
 	let listRef =&*list; 
@@ -39,7 +47,7 @@ fn ReadFromList(state: State<SafeNameList>) -> String {
 }
 
 fn main() {
-	let list: SafeNameList = SafeNameList::new(vec![]);
+	let list: SafePersonList = SafePersonList::new(vec![]);
 
     rocket::ignite()
 		.mount("/", routes![index, AddToList, ReadFromList])

@@ -3,8 +3,11 @@
 <html>
 	<a id="NameList"></a>
 	<br>
-	
-  	<input type="text" id="editName" name="editName">
+
+  	<label >Name:</label><br><input type="text" id="editName" name="editName"><br>
+	<label >Age:</label><br><input type="number" id="editAge" name="editAge"><br>
+	<label >Height:</label><br><input type="number" id="editHeight" name="editHeight">
+
 	<button onclick="clk()">Add</button> 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script>
@@ -28,8 +31,15 @@
 
 			var list = document.createElement("ul");
     		for (let i of data) {
+				text = JSON.stringify(i)
+					.replaceAll("{","")
+					.replaceAll("}","")
+					.replaceAll(/['"]+/g,'')
+					.replaceAll(",",", ")
+					.replaceAll(":", ": ")
+				
 				var item = document.createElement("li");
-				item.textContent = i;
+				item.textContent = text;
 				list.appendChild(item);
 			} 
 			
@@ -42,11 +52,20 @@
 		function clk(){
 	
 			var editName = document.getElementById("editName");
+			var editAge = document.getElementById("editAge");
+			var editHeight = document.getElementById("editHeight");
 			
 			let xhr = new XMLHttpRequest();
 			let url = "http://localhost:8000/";
-			xhr.open("GET", url.concat(editName.value));
-			editName.value = ''
+			xhr.open("GET", url
+				.concat(editName.value)
+				.concat("/")
+				.concat(editAge.value)
+				.concat("/")
+				.concat(editHeight.value));
+			editName.value = '';
+			editAge.value = '';
+			editHeight.value = '';
 
 			xhr.send();
 
