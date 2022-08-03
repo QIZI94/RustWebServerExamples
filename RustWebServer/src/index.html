@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html>
+	<a id="NameList"></a>
+	<br>
+	
+  	<input type="text" id="editName" name="editName">
+	<button onclick="clk()">Add</button> 
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script>
+		document.body.onload = function(){
+			let xhr = new XMLHttpRequest();
+			let url = "http://localhost:8000/list";
+			xhr.open("GET", url);
+			xhr.send();
+
+			xhr.onload = () => makeListFromJson(xhr.responseText);
+		};
+		
+		function removeAllChildNodes(parent) {
+			while (parent.firstChild) {
+				parent.removeChild(parent.firstChild);
+			}
+		}
+
+		function makeListFromJson(json){
+			var data = JSON.parse(json);
+
+			var list = document.createElement("ul");
+    		for (let i of data) {
+				var item = document.createElement("li");
+				item.textContent = i;
+				list.appendChild(item);
+			} 
+			
+			var parent = document.getElementById("NameList");
+			removeAllChildNodes(parent);
+			parent.textContent = 'Persistent Name List:';
+			parent.appendChild(list);
+		}
+
+		function clk(){
+	
+			var editName = document.getElementById("editName");
+			
+			let xhr = new XMLHttpRequest();
+			let url = "http://localhost:8000/";
+			xhr.open("GET", url.concat(editName.value));
+			editName.value = ''
+
+			xhr.send();
+
+			xhr.onload = () => makeListFromJson(xhr.responseText);
+			
+		}
+	</script>
+
+</html>
