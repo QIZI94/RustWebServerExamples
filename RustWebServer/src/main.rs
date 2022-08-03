@@ -6,7 +6,6 @@ extern crate serde;
 
 
 use rocket::response::content;
-use rocket::response::status;
 use rocket::State;
 use std::sync::Mutex;
 use serde::{Deserialize, Serialize};
@@ -17,8 +16,8 @@ struct Person{
 	height: f32
 }
 
-pub type PersonList = Vec<Person>;
-pub type SafePersonList = Mutex<PersonList>;
+type PersonList = Vec<Person>;
+type SafePersonList = Mutex<PersonList>;
 
 #[get("/")]
 fn index() -> content::Html<String>  {
